@@ -1,17 +1,28 @@
 #include "game_of_life.h"
+//compute live cells destiny:
+//if it has 2-3 neighbours it survives...
+//else it dies
+static int live_cell(int s[][SIZE], int row, int col);
 
-void init_game(Game *game, const int scheme[][SIZE])
-{
-	int *s1 = game->space1;
+//compute empty cells destiny:
+//if there is exactly 3 neighbours a new cell was born...
+//else the cell remain empty
+static int empty_cell(int s[][SIZE], int row, int col);
+
+void init_game(struct game *g, const int scheme[][SIZE], unsigned gen)
+{	
+	g->tick_flag = 1;
+	g->generation = gen;
 	
 	for(int row = 0; row < SIZE; row++) {
 		for(int col = 0; col < SIZE; col++) {
-			s1[row][col] = scheme[col][row];
+			g->space1[row][col] = scheme[col][row];
+			g->space2[row][col] = 0;
 		}
 	}
 }
 
-void print_space(const int s[][SIZE])
+void print_space(int s[][SIZE])
 {	
 	//upper frame
 	for (int i = 1; i < SIZE + 2; i++) {
@@ -35,44 +46,67 @@ void print_space(const int s[][SIZE])
 	printf("\n");
 }
 
-void next_generation(Game *game)
+void next_generation(struct game *g)
 {
-	bool tick = game->tick_flag;
-	int *s1 = game->space1;
-	int *s2 = game->space2;
+	//int (*s1)[SIZE][SIZE] = &g->space1;
+	//int (*s2)[SIZE][SIZE] = &g->space2;
 	
-	if (tick == 1) {
-		for (int i = 1; i < row; i++) {
+	if (g->tick_flag == 1) {
+		for (int i = 1; i < SIZE; i++) {
 			for (int j = 1; j < SIZE; j++) {
-				if (s1[i][j] == 1) {
-					s2[i][j] = live_cell(s1, i, j);
+				if (g->space1[i][j] == 1) {
+					g->space2[i][j] = live_cell(g->space1, i, j);
 				}
 				else {
-					s2[i][j] = empty_cell(s1, i, j);
+					g->space2[i][j] = empty_cell(g->space1, i, j);
 				}
 			}
 		}
 	}
 	else {
-		for (int i = 1; i < row; i++) {
+		for (int i = 1; i < SIZE; i++) {
 			for (int j = 1; j < SIZE; j++) {
-				if (s2[i][j] == 1) {
-					s1[i][j] = live_cell(s2, i, j);
+				if (g->space2[i][j] == 1) {
+					g->space1[i][j] = live_cell(g->space2, i, j);
 				}
 				else {
-					s1[i][j] = empty_cell(s2, i, j);
+					g->space1[i][j] = empty_cell(g->space2, i, j);
 				}
 			}
 		}
 	}
-
-	tick = 1 - tick;	//toggle tick
+	
+	/*
+	if (g->tick_flag == 1) {
+		for (int i = 1; i < SIZE; i++) {
+			for (int j = 1; j < SIZE; j++) {
+				if (*s1[i][j] == 1) {
+					*s2[i][j] = live_cell(g->space1, i, j);
+				}
+				else {
+					*s2[i][j] = empty_cell(g->space1, i, j);
+				}
+			}
+		}
+	}
+	else {
+		for (int i = 1; i < SIZE; i++) {
+			for (int j = 1; j < SIZE; j++) {
+				if (*s2[i][j] == 1) {
+					*s1[i][j] = live_cell(g->space2, i, j);
+				}
+				else {
+					*s1[i][j] = empty_cell(g->space2, i, j);
+				}
+			}
+		}
+	}
+	*/
+	g->tick_flag = 1 - g->tick_flag;	//toggle tick
 }
 
-//compute live cells destiny:
-//if it has 2-3 neighbours it survives...
-//else it dies
-static int live_cell(const int s[][SIZE], int row, int col)
+
+static int live_cell(int s[][SIZE], int row, int col)
 {
 	int neighbours = 0;
 
@@ -92,10 +126,8 @@ static int live_cell(const int s[][SIZE], int row, int col)
 	return 0; //cell dies
 }
 
-//compute empty cells destiny:
-//if there is exactly 3 neighbours a new cell was born...
-//else the cell remain empty
-static int empty_cell(const int s[][SIZE], int row, int col)
+
+static int empty_cell(int s[][SIZE], int row, int col)
 {
 	int neighbours = 0;
 
