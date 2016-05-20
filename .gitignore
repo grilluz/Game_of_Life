@@ -32,10 +32,10 @@
 *.dSYM/
 
 #build folder
-build/
+/build
 
 #binary folder
-bin/
+/bin
 
 #readme folder
-readme_img/
+/readme_img
