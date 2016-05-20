@@ -31,8 +31,10 @@
 # Debug files
 *.dSYM/
 
-#compilation folders
+#build folder
 build/
+
+#binary folder
 bin/
 
 #readme folder
